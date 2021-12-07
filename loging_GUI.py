@@ -67,12 +67,16 @@ class Login_GUI:
         self.root.wm_title('asd')
         self.root.wm_protocol("WM_DELETE_WINDOW", self.onClose)
 
+#Video loop with face detector and recognizer running in it
     def videoLoop(self):
         try:
             while not self.stopEvent.is_set():
+                #gets the videofeed
                 self.frame = self.vs.read()
                 self.frame = imutils.resize(self.frame, width=500)
 
+                #makes the cideofeed into cv2 compatible forms to be displayed in tkinter
+                #and to the face recognizer
                 image = cv.cvtColor(self.frame, cv.COLOR_BGR2RGB)
                 gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
                 
@@ -80,7 +84,8 @@ class Login_GUI:
                 faces_rect = haar_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4)
                 for (x,y,w,h) in faces_rect:
                     faces_roi = gray[y:y+h,x:x+w]
-
+                    
+                    #checks if trained faces axists and  if they do runs the recognizer
                     if path.exists('/home/pi/camera_test/face_trained.yml'):
                         self.train_checker
                         label, confidence = self.train_checker.predict(faces_roi)
@@ -97,6 +102,7 @@ class Login_GUI:
                 image = Image.fromarray(self.frame)
                 image = ImageTk.PhotoImage(image)             
                 
+                #updating the screen
                 if self.panel is None:
                     self.panel = tki.Label(image = image)
                     self.panel.image = image
@@ -109,7 +115,8 @@ class Login_GUI:
         except RuntimeError :
             print("runtimeError")
 
-
+#picture taking function
+#only works if name is set
     def takeSnapshot(self):
         ts = datetime.datetime.now()
         if self.name:
@@ -119,6 +126,9 @@ class Login_GUI:
         else:
             pass
 
+#set name function that checks if the name is used.
+#if not then it creates a folder for it to save pictures into
+#also creates name in a text file for the trainer labels THIS IS TEMP SOLUTION
     def set_name(self):
         self.name = self.name_var.get()
         if self.path.exists('/home/pi/camera_test/faces/' + self.name):
@@ -133,7 +143,7 @@ class Login_GUI:
             os.mkdir(path)
             mode = 0o666
             return self.name
-
+#closes the program, windows and videostreams
     def onClose(self):
         self.stopEvent.set()
         self.vs.stop()
