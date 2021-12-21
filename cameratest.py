@@ -4,6 +4,21 @@ import os
 import tkinter as tk
 import tkinter.font
 from PIL import Image, ImageTk
+import pyrebase #sudo pip install pyrebase
+
+firebase_config = {
+    "apiKey": "AIzaSyD2PRJDK0XZc7AXoV4EIYAT39lARK4WKb8",
+    "authDomain": "naamakirja-dea54.firebaseapp.com",
+    "databaseURL": "https://naamakirja-dea54-default-rtdb.europe-west1.firebasedatabase.app",
+    "projectId": "naamakirja-dea54",
+    "storageBucket": "naamakirja-dea54.appspot.com",
+    "serviceAccount": "serviceAccountKey.json"
+    #need to download serviceKey and rename it to serviceAccountKey
+    #project settings -> service accounts -> python -> generate new private key
+    }
+
+firebase_storage = pyrebase.initialize_app(firebase_config)
+storage = firebase_storage.storage()
 
 camera = PiCamera()
 
@@ -24,9 +39,14 @@ def capture():
         print(f"name will be '{pic_name}'")
         print("taking picture...")
         sleep(2)
-        camera.capture('/home/pi/Desktop/%s.jpg' %pic_name)
-        print("saved a picture to desktop named '%s'" %pic_name)
+        camera.capture('/home/pi/group_20/pics/%s.jpg' %pic_name)
+        print("saved a picture named '%s'" %pic_name)
+        
+        #upload image to firebase storage
+        storage.child("antti/%s.jpg" %pic_name).put("/home/pi/group_20/pics/%s.jpg" %pic_name)
+        
         camera.stop_preview()
+        
     else:
         print("no name given, give a name.")
 #method to close the window

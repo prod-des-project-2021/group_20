@@ -16,6 +16,21 @@ from imutils.video import VideoStream
 import face_train
 import check_if_train_exists
 
+import pyrebase #sudo pip install pyrebase
+
+firebase_config = {
+    "apiKey": "AIzaSyD2PRJDK0XZc7AXoV4EIYAT39lARK4WKb8",
+    "authDomain": "naamakirja-dea54.firebaseapp.com",
+    "databaseURL": "https://naamakirja-dea54-default-rtdb.europe-west1.firebasedatabase.app",
+    "projectId": "naamakirja-dea54",
+    "storageBucket": "naamakirja-dea54.appspot.com",
+    "serviceAccount": "serviceAccountKey.json"
+    #need to download serviceKey and rename it to serviceAccountKey
+    #project settings -> service accounts -> python -> generate new private key
+    }
+
+firebase_storage = pyrebase.initialize_app(firebase_config)
+storage = firebase_storage.storage()
 
 class Login_GUI:
     def __init__(self, vs):
@@ -86,7 +101,7 @@ class Login_GUI:
                     faces_roi = gray[y:y+h,x:x+w]
                     
                     #checks if trained faces axists and  if they do runs the recognizer
-                    if path.exists('/home/pi/camera_test/face_trained.yml'):
+                    if path.exists('/home/pi/group_20/camera_test/face_trained.yml'):
                         self.train_checker
                         label, confidence = self.train_checker.predict(faces_roi)
                         print(f'Label = {self.people[label]} with a confidence of {confidence}')
@@ -118,11 +133,27 @@ class Login_GUI:
 #picture taking function
 #only works if name is set
     def takeSnapshot(self):
+        
+        #loops thru all files with .jpg ending and deletes them
+        #so it doesnt keep on downloading same images
+        filelist = [ f for f in os.listdir("/home/pi/group_20/faces/" + self.name) if f.endswith(".jpg") ]
+        for f in filelist:
+            os.remove(os.path.join("/home/pi/group_20/faces/" + self.name, f))
+        
+        #download images from storage
+        all_storage_files = storage.list_files()
+        for storage_file in all_storage_files:
+            #print("filename in storage:" + storage_file.name) #prints filenames
+            storage_file.download_to_filename("/home/pi/group_20/faces/" + storage_file.name)
+        
         ts = datetime.datetime.now()
         if self.name:
-            filename = '/home/pi/camera_test/faces/' + self.name + "/image_{}.jpg".format(ts.strftime("%Y-%m-%d_%H-%M-%S"))
+            filename = '/home/pi/group_20/faces/' + self.name + "/image_{}.jpg".format(ts.strftime("%Y-%m-%d_%H-%M-%S"))
             cv.imwrite(filename, self.frame.copy())
             print("{}".format(filename))
+            
+            #upload image to firebase storage
+            storage.child(self.name + "/image_{}.jpg".format(ts.strftime("%Y-%m-%d_%H-%M-%S"))).put(filename)
         else:
             pass
 
@@ -131,14 +162,14 @@ class Login_GUI:
 #also creates name in a text file for the trainer labels THIS IS TEMP SOLUTION
     def set_name(self):
         self.name = self.name_var.get()
-        if self.path.exists('/home/pi/camera_test/faces/' + self.name):
+        if self.path.exists('/home/pi/group_20/faces/' + self.name):
             print(self.name)
         else:
             name_file = open("name_file.txt", "a+")
             name_file.write(f"{self.name}\r\n")  
             name_file.close()    
             directory = self.name
-            parent_dir = '/home/pi/camera_test/faces'
+            parent_dir = '/home/pi/group_20/faces'
             path = os.path.join(parent_dir, directory)
             os.mkdir(path)
             mode = 0o666
