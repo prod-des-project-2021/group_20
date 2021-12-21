@@ -18,19 +18,19 @@ import check_if_train_exists
 
 import pyrebase #sudo pip install pyrebase
 
-firebase_config = {
-    "apiKey": "AIzaSyD2PRJDK0XZc7AXoV4EIYAT39lARK4WKb8",
-    "authDomain": "naamakirja-dea54.firebaseapp.com",
-    "databaseURL": "https://naamakirja-dea54-default-rtdb.europe-west1.firebasedatabase.app",
-    "projectId": "naamakirja-dea54",
-    "storageBucket": "naamakirja-dea54.appspot.com",
-    "serviceAccount": "serviceAccountKey.json"
+#firebase_config = {
+#    "apiKey": "AIzaSyD2PRJDK0XZc7AXoV4EIYAT39lARK4WKb8",
+#    "authDomain": "naamakirja-dea54.firebaseapp.com",
+#    "databaseURL": "https://naamakirja-dea54-default-rtdb.europe-west1.firebasedatabase.app",
+#    "projectId": "naamakirja-dea54",
+#    "storageBucket": "naamakirja-dea54.appspot.com",
+#    "serviceAccount": "serviceAccountKey.json"
     #need to download serviceKey and rename it to serviceAccountKey
     #project settings -> service accounts -> python -> generate new private key
-    }
+#    }
 
-firebase_storage = pyrebase.initialize_app(firebase_config)
-storage = firebase_storage.storage()
+#firebase_storage = pyrebase.initialize_app(firebase_config)
+#storage = firebase_storage.storage()
 
 class Login_GUI:
     def __init__(self, vs):
@@ -136,15 +136,15 @@ class Login_GUI:
         
         #loops thru all files with .jpg ending and deletes them
         #so it doesnt keep on downloading same images
-        filelist = [ f for f in os.listdir("/home/pi/group_20/faces/" + self.name) if f.endswith(".jpg") ]
-        for f in filelist:
-            os.remove(os.path.join("/home/pi/group_20/faces/" + self.name, f))
+        #filelist = [ f for f in os.listdir("/home/pi/group_20/faces/" + self.name) if f.endswith(".jpg") ]
+        #for f in filelist:
+        #    os.remove(os.path.join("/home/pi/group_20/faces/" + self.name, f))
         
         #download images from storage
-        all_storage_files = storage.list_files()
-        for storage_file in all_storage_files:
-            #print("filename in storage:" + storage_file.name) #prints filenames
-            storage_file.download_to_filename("/home/pi/group_20/faces/" + storage_file.name)
+        #all_storage_files = storage.list_files()
+        #for storage_file in all_storage_files:
+        #    print("filename in storage:" + storage_file.name) #prints filenames
+        #    storage_file.download_to_filename("/home/pi/group_20/faces/" + storage_file.name)
         
         ts = datetime.datetime.now()
         if self.name:
@@ -153,7 +153,7 @@ class Login_GUI:
             print("{}".format(filename))
             
             #upload image to firebase storage
-            storage.child(self.name + "/image_{}.jpg".format(ts.strftime("%Y-%m-%d_%H-%M-%S"))).put(filename)
+            #storage.child(self.name + "/image_{}.jpg".format(ts.strftime("%Y-%m-%d_%H-%M-%S"))).put(filename)
         else:
             pass
 

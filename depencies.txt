@@ -1,0 +1,5 @@
+Pillow
+tkinter
+imutils
+cv2
+numpy

@@ -14,7 +14,7 @@ class Train_Faces:
 
         self.people = self.lines
         print(self.people)
-        self.DIR = r'/home/pi/camera_test/faces'
+        self.DIR = r'/home/pi/group_20/faces'
 
         self.haar_cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
 
@@ -60,11 +60,11 @@ class Train_Faces:
         np.save('features.npy', self.features)
         np.save('labels.npy', self.labels)
 
-        if path.exists('/home/pi/camera_test/features.npy'):
+        if path.exists('/home/pi/group_20/features.npy'):
             features = np.load('features.npy')
         else:
             pass
-        if path.exists('/home/pi/camera_test/labels.npy'):
+        if path.exists('/home/pi/group_20/labels.npy'):
             labels = np.load('labels.npy')
         else:
             pass
